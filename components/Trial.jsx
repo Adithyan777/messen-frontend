@@ -17,6 +17,18 @@ import { useRouter } from "next/navigation";
 
 export default function Trial() {
   const router = useRouter()
+
+  const environment = process.env.NODE_ENV;
+  const baseUrl = environment === 'production'
+    ? process.env.BACKEND_URL
+    : process.env.DEVELOPMENT_BACKEND_URL;
+  const protocol = environment === 'production' ? 'https' : 'http';
+  const backendUrl = (endpoint) => `${protocol}://${baseUrl}${endpoint}`;
+
+  console.log("Environment:", environment);
+console.log("Base URL:", baseUrl);
+console.log("Backend URL:", backendUrl('/flowRate'));
+
   const quantities = [
     "flowRate",
     "inletPressure",
@@ -80,7 +92,7 @@ export default function Trial() {
     console.log(combinedData);
 
     try {
-      const response = await fetch('http://localhost:8080/flowRate', {
+      const response = await fetch(backendUrl('/flowRate'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

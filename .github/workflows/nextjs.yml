@@ -76,8 +76,8 @@ jobs:
       - name: Build with Next.js
         run: ${{ steps.detect-package-manager.outputs.runner }} next build
         env:
-          NODE_ENV: secrets.NODE_ENV
-          BACKEND_URL : sectrets.BACKEND_URL
+          NODE_ENV: ${{ secrets.NODE.ENV }}
+          BACKEND_URL : ${{ secrets.BACKEND_URL }}
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

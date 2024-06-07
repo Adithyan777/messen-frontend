@@ -16,7 +16,7 @@ import { useRouter } from "next/navigation";
 
 
 export default function Trial() {
-  const router = useRouter()
+  const router = useRouter();
 
   const environment = process.env.NODE_ENV;
   const baseUrl = environment === 'production'
@@ -25,9 +25,9 @@ export default function Trial() {
   const protocol = environment === 'production' ? 'https' : 'http';
   const backendUrl = (endpoint) => `${protocol}://${baseUrl}${endpoint}`;
 
-// console.log("Environment:", environment);
-// console.log("Base URL:", baseUrl);
-// console.log("Backend URL:", backendUrl('/flowRate'));
+  console.log("Environment:", environment);
+  console.log("Base URL:", baseUrl);
+  console.log("Backend URL:", backendUrl('/flowRate'));
 
   const quantities = [
     "flowRate",
@@ -85,9 +85,6 @@ export default function Trial() {
     e.preventDefault();
 
     const combinedData = {formData,selectedUnit};
-    // quantities.forEach(quantity => {
-    //   combinedData[quantity] = `${formData[quantity]} ${selectedUnit[quantity]}`;
-    // });
 
     console.log(combinedData);
 
@@ -114,6 +111,35 @@ export default function Trial() {
   const handleClear = () => {
     setFormData(initialFormData);
     setSelectedUnit(initialSelectedUnits);
+  };
+
+  const handleFillSampleData = () => {
+    const sampleData = {
+      flowRate: '8069.6721',
+      inletPressure: '100',
+      pressureDrop: '3.107',
+      specificGravity: '1',
+      vapourPressure: '1',
+      criticalPressure: '3.208',
+      recoveryFactor: '0.27',
+      lineDiameter: '24',
+      valveDiameter: '12'
+    };
+
+    const sampleUnits = {
+      flowRate: 'gal/min',
+      inletPressure: 'psia',
+      pressureDrop: 'psi',
+      specificGravity: 'unitless',
+      vapourPressure: 'psia',
+      criticalPressure: 'psia',
+      recoveryFactor: 'unitless',
+      lineDiameter: 'in',
+      valveDiameter: 'in'
+    };
+
+    setFormData(sampleData);
+    setSelectedUnit(sampleUnits);
   };
 
   return (
@@ -158,6 +184,9 @@ export default function Trial() {
         <div className="w-[575px] flex justify-between items-center mt-7">
           <Button variant="outline" type="button" onClick={handleClear}>
             Clear
+          </Button>
+          <Button variant="outline" type="button" onClick={handleFillSampleData}>
+            Fill Sample Data
           </Button>
           <Button type="submit">Calculate Cv</Button>
         </div>

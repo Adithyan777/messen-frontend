@@ -133,27 +133,27 @@ export default function Trial() {
 
   const handleFillSampleData = () => {
     const sampleData = {
-      flowRate: '8069.6721',
-      inletPressure: '100',
-      pressureDrop: '3.107',
+      flowRate: '2.746',
+      inletPressure: '146',
+      pressureDrop: '1',
       specificGravity: '1',
-      vapourPressure: '1',
-      criticalPressure: '3.208',
-      recoveryFactor: '0.27',
-      lineDiameter: '24',
-      valveDiameter: '12'
+      vapourPressure: '0.03158',
+      criticalPressure: '220.5',
+      recoveryFactor: '0.9',
+      lineDiameter: '25',
+      valveDiameter: '24'
     };
 
     const sampleUnits = {
-      flowRate: 'gal/min',
-      inletPressure: 'psia',
+      flowRate: 'm3/h',
+      inletPressure: 'psi',
       pressureDrop: 'psi',
       specificGravity: 'unitless',
-      vapourPressure: 'psia',
-      criticalPressure: 'psia',
+      vapourPressure: 'bar',
+      criticalPressure: 'bar',
       recoveryFactor: 'unitless',
-      lineDiameter: 'in',
-      valveDiameter: 'in'
+      lineDiameter: 'mm',
+      valveDiameter: 'mm'
     };
 
     setFormData(sampleData);

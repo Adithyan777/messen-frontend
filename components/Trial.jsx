@@ -62,15 +62,18 @@ export default function Trial() {
 
   const initialFormData = {};
   const initialSelectedUnits = {};
+  const initialErrors = {};
 
-  // Initialize form data and selected units objects dynamically
+  // Initialize form data, selected units, and errors objects dynamically
   quantities.forEach(quantity => {
     initialFormData[quantity] = "";
     initialSelectedUnits[quantity] = units[quantity][0]; // Set default unit
+    initialErrors[quantity] = ""; // Initialize error messages as empty
   });
 
   const [formData, setFormData] = useState(initialFormData);
   const [selectedUnit, setSelectedUnit] = useState(initialSelectedUnits);
+  const [errors, setErrors] = useState(initialErrors);
 
   const handleSelectChange = (quantity, value) => {
     setSelectedUnit((prev) => ({ ...prev, [quantity]: value }));
@@ -78,13 +81,27 @@ export default function Trial() {
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
+    // Validate input to ensure it is a number
+    const numberValue = parseFloat(value);
+    if (isNaN(numberValue)) {
+      setErrors((prev) => ({ ...prev, [id]: "Value must be a number" }));
+    } else {
+      setErrors((prev) => ({ ...prev, [id]: "" }));
+    }
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
   const handleSubmit = async(e) => {
     e.preventDefault();
 
-    const combinedData = {formData,selectedUnit};
+    // Check for any validation errors
+    const hasErrors = Object.values(errors).some((error) => error !== "");
+    if (hasErrors) {
+      console.error('Validation errors:', errors);
+      return;
+    }
+
+    const combinedData = {formData, selectedUnit};
 
     console.log(combinedData);
 
@@ -98,10 +115,10 @@ export default function Trial() {
       });
 
       const result = await response.json();
-      localStorage.setItem("response" , JSON.stringify(result));
-      localStorage.setItem("unit",selectedUnit['inletPressure']);
+      localStorage.setItem("response", JSON.stringify(result));
+      localStorage.setItem("unit", selectedUnit['inletPressure']);
 
-      // Navigate to result page with query parameters
+
       router.push(`/result`);
     } catch (error) {
       console.error('Error:', error);
@@ -111,6 +128,7 @@ export default function Trial() {
   const handleClear = () => {
     setFormData(initialFormData);
     setSelectedUnit(initialSelectedUnits);
+    setErrors(initialErrors);
   };
 
   const handleFillSampleData = () => {
@@ -140,6 +158,7 @@ export default function Trial() {
 
     setFormData(sampleData);
     setSelectedUnit(sampleUnits);
+    setErrors(initialErrors);
   };
 
   return (
@@ -178,6 +197,9 @@ export default function Trial() {
                 className="w-64"
                 required
               />
+              {errors[quantity] && (
+                <small className="text-primary text-sm font-medium leading-none">{errors[quantity]}</small>
+              )}
             </div>
           ))}
         </div>

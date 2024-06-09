@@ -18,12 +18,11 @@ const Page = () => {
     const storedUnit = localStorage.getItem('unit');
     setResponse(storedResponse);
     setUnit(storedUnit);
-  }, []); // Run only once on component mount
 
     // removing response from localStorage if page is changed.
-    // useEffect(()=>{
-    //     return ()=>{localStorage.removeItem("response")};
-    // },[])
+    // return ()=>{localStorage.removeItem("response")};
+
+  }, []); // Run only once on component mount
 
   const baseUnits = {
     pressureDropAcrossInletReducers: unit,

@@ -25,9 +25,9 @@ export default function Trial() {
   const protocol = environment === 'production' ? 'https' : 'http';
   const backendUrl = (endpoint) => `${protocol}://${baseUrl}${endpoint}`;
 
-  console.log("Environment:", environment);
-  console.log("Base URL:", baseUrl);
-  console.log("Backend URL:", backendUrl('/flowRate'));
+  // console.log("Environment:", environment);
+  // console.log("Base URL:", baseUrl);
+  // console.log("Backend URL:", backendUrl('/flowRate'));
 
   const quantities = [
     "flowRate",

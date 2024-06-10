@@ -1,10 +1,10 @@
-'use client'
+'use client';
 
 import * as React from "react";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useEffect } from "react";
 import {
   Select,
   SelectContent,
@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useRouter } from "next/navigation";
-
+import { useStateStore } from "@/app/stores";
 
 export default function Trial() {
   const router = useRouter();
@@ -25,83 +25,40 @@ export default function Trial() {
   const protocol = environment === 'production' ? 'https' : 'http';
   const backendUrl = (endpoint) => `${protocol}://${baseUrl}${endpoint}`;
 
-  // console.log("Environment:", environment);
-  // console.log("Base URL:", baseUrl);
-  // console.log("Backend URL:", backendUrl('/flowRate'));
+  const {
+    formData,
+    selectedUnit,
+    errors,
+    quantities,
+    units,
+    handleSelectChange,
+    handleInputChange,
+    handleClear,
+    handleFillSampleData,
+    setResponse
+  } = useStateStore();
 
-  const quantities = [
-    "flowRate",
-    "inletPressure",
-    "pressureDrop",
-    "specificGravity",
-    "vapourPressure",
-    "criticalPressure",
-    "recoveryFactor",
-    "lineDiameter",
-    "valveDiameter"
-  ];
-
-  const units = {
-    "flowRate": ["gal/min","m3/h","l/h"],
-    "inletPressure": ["psia","psi","bar", "kPa"],
-    "pressureDrop": ["psi","bar","kPa"],
-    "specificGravity": ["unitless"],
-    "vapourPressure": ["psia","psi","bar", "kPa"],
-    "criticalPressure": ["psia","psi","bar", "kPa"],
-    "recoveryFactor": ["unitless","%"],
-    "lineDiameter": ["in", "mm"],
-    "valveDiameter": ["in", "mm"]
-  };
+  useEffect(() => {
+    setResponse(null, "");
+  }, []);
 
   function fromCamelCase(str) {
     return str
-        .replace(/([A-Z])/g, ' $1') // Insert a space before each uppercase letter
-        .trim() // Remove leading and trailing spaces
-        .replace(/^./, str[0].toUpperCase()); // Capitalize the first letter
+        .replace(/([A-Z])/g, ' $1')
+        .trim()
+        .replace(/^./, str[0].toUpperCase());
   }
 
-  const initialFormData = {};
-  const initialSelectedUnits = {};
-  const initialErrors = {};
-
-  // Initialize form data, selected units, and errors objects dynamically
-  quantities.forEach(quantity => {
-    initialFormData[quantity] = "";
-    initialSelectedUnits[quantity] = units[quantity][0]; // Set default unit
-    initialErrors[quantity] = ""; // Initialize error messages as empty
-  });
-
-  const [formData, setFormData] = useState(initialFormData);
-  const [selectedUnit, setSelectedUnit] = useState(initialSelectedUnits);
-  const [errors, setErrors] = useState(initialErrors);
-
-  const handleSelectChange = (quantity, value) => {
-    setSelectedUnit((prev) => ({ ...prev, [quantity]: value }));
-  };
-
-  const handleInputChange = (e) => {
-    const { id, value } = e.target;
-    // Validate input to ensure it is a number
-    const numberValue = parseFloat(value);
-    if (isNaN(numberValue)) {
-      setErrors((prev) => ({ ...prev, [id]: "Value must be a number" }));
-    } else {
-      setErrors((prev) => ({ ...prev, [id]: "" }));
-    }
-    setFormData((prev) => ({ ...prev, [id]: value }));
-  };
-
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Check for any validation errors
     const hasErrors = Object.values(errors).some((error) => error !== "");
     if (hasErrors) {
       console.error('Validation errors:', errors);
       return;
     }
 
-    const combinedData = {formData, selectedUnit};
+    const combinedData = { formData, selectedUnit };
 
     console.log(combinedData);
 
@@ -115,50 +72,12 @@ export default function Trial() {
       });
 
       const result = await response.json();
-      localStorage.setItem("response", JSON.stringify(result));
-      localStorage.setItem("unit", selectedUnit['inletPressure']);
-
+      setResponse(result, selectedUnit['inletPressure']);
 
       router.push(`/result`);
     } catch (error) {
       console.error('Error:', error);
     }
-  };
-
-  const handleClear = () => {
-    setFormData(initialFormData);
-    setSelectedUnit(initialSelectedUnits);
-    setErrors(initialErrors);
-  };
-
-  const handleFillSampleData = () => {
-    const sampleData = {
-      flowRate: '2.746',
-      inletPressure: '146',
-      pressureDrop: '1',
-      specificGravity: '1',
-      vapourPressure: '0.03158',
-      criticalPressure: '220.5',
-      recoveryFactor: '0.9',
-      lineDiameter: '25',
-      valveDiameter: '24'
-    };
-
-    const sampleUnits = {
-      flowRate: 'm3/h',
-      inletPressure: 'psi',
-      pressureDrop: 'psi',
-      specificGravity: 'unitless',
-      vapourPressure: 'bar',
-      criticalPressure: 'bar',
-      recoveryFactor: 'unitless',
-      lineDiameter: 'mm',
-      valveDiameter: 'mm'
-    };
-
-    setFormData(sampleData);
-    setSelectedUnit(sampleUnits);
-    setErrors(initialErrors);
   };
 
   return (
@@ -172,33 +91,35 @@ export default function Trial() {
         <div className="grid w-full items-center gap-4">
           {quantities.map((quantity) => (
             <div key={quantity} className="flex items-center space-x-4">
-              <Label htmlFor={quantity} className="font-semibold w-40">{fromCamelCase(quantity) + ":"}</Label>
+              <Label htmlFor={quantity} className="font-semibold w-40">
+                {fromCamelCase(quantity) + ":"}
+              </Label>
               <Select
                 onValueChange={(value) => handleSelectChange(quantity, value)}
-                value={selectedUnit[quantity]} // Controlled select component
+                value={selectedUnit[quantity]}
                 defaultValue={units[quantity][0]}
               >
                 <SelectTrigger id={quantity} className="w-32">
                   <SelectValue placeholder="select unit" />
                 </SelectTrigger>
                 <SelectContent position="popper">
-                {
-                  units[quantity].map((unit) => (
+                  {units[quantity].map((unit) => (
                     <SelectItem key={unit} value={unit}>{unit}</SelectItem>
-                  ))
-                }
+                  ))}
                 </SelectContent>
               </Select>
               <Input
                 id={quantity}
                 placeholder={`Enter ${fromCamelCase(quantity)}`}
                 value={formData[quantity]}
-                onChange={handleInputChange}
+                onChange={(e) => handleInputChange(e.target.id, e.target.value)}
                 className="w-64"
                 required
               />
               {errors[quantity] && (
-                <small className="text-primary text-sm font-medium leading-none">{errors[quantity]}</small>
+                <small className="text-primary text-sm font-medium leading-none">
+                  {errors[quantity]}
+                </small>
               )}
             </div>
           ))}

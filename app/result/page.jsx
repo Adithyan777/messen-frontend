@@ -1,6 +1,8 @@
 'use client'
 
-import React, { useEffect, useState } from 'react';
+import { useStateStore } from "../stores";
+import GoBackButton from "@/components/GoBackButton";
+import { useRouter } from "next/navigation";
 
 const fromCamelCase = (str) => {
   return str
@@ -10,20 +12,8 @@ const fromCamelCase = (str) => {
 };
 
 const Page = () => {
-  const [unit, setUnit] = useState('');
-  const [response, setResponse] = useState(null);
-
-  useEffect(() => {
-    const storedResponse = JSON.parse(localStorage.getItem('response'));
-    const storedUnit = localStorage.getItem('unit');
-    setResponse(storedResponse);
-    setUnit(storedUnit);
-
-    // removing response from localStorage if page is changed.
-    // return ()=>{localStorage.removeItem("response")};
-
-  }, []); // Run only once on component mount
-
+  const { response, unit } = useStateStore();
+  const router = useRouter();
   const baseUnits = {
     pressureDropAcrossInletReducers: unit,
     pressureAtTheValveInlet: unit,
@@ -34,8 +24,9 @@ const Page = () => {
     requiredFlowCoefficient: unit
   };
 
-  if (!response) {
-    return <div>Loading...</div>; // Or any loading indicator
+  if (response === null) {
+   router.replace('/')
+   return;
   }
 
   // Extract the final quantity
@@ -45,7 +36,9 @@ const Page = () => {
   const { requiredFlowCoefficient, ...intermediateQuantities } = response;
 
   return (
-    <div className='m-10'>
+    <>
+    <GoBackButton/>
+    <div className='mx-10 my-2'>
       <h1 className="text-primary scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
         Flow Coefficient Calculation Report
       </h1>
@@ -64,6 +57,7 @@ const Page = () => {
         <strong>{"Required Flow Coefficent" + " : " + finalQuantity}</strong>
       </h3>
     </div>
+    </>
   );
 };
 

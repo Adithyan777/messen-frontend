@@ -1,11 +1,9 @@
-import Trial from "@/components/v1";
-import Trial2 from "@/components/v2";
+import Version1 from "@/components/v1";
 
 export default function Home() {
   return (
     <>
-      <Trial2/>
-      {/* <Trial/> */}
+      <Version1/>
     </>
   );
 }

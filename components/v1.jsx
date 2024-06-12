@@ -15,7 +15,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useStateStore } from "@/app/stores";
 
-export default function Trial() {
+export default function Version1() {
   const router = useRouter();
 
   const environment = process.env.NODE_ENV;
